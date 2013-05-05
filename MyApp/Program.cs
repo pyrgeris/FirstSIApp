@@ -18,13 +18,28 @@ namespace MyApp
         static void PassThrough(Application app)
         {
 
-            var sensorStream = GetNewSensorStream(app);
+            var inputStream = GetNewSensorStream(app);
 
 
-            var query1 = from e in sensorStream
+            var query1 = from e in inputStream
                          select e;
             app.DisplayIntervalResults(query1);
 
+        }
+
+
+        [DisplayName("Hopping Count")]
+        [Description("Report the count of input values being processed at some time over " +
+                     "a 10000 ms window, with the window moving in 200 ms hops. " +
+                     "Provide the counts as of the last reported result as of a point " +
+                     "in time, reflecting the input values processed over the last 10000 ms.")]
+        static void HoppingCount(Application app)
+        {
+            var inputStream = app.GetNewSensorStream();
+            var countStream = from win in inputStream.HoppingWindow(TimeSpan.FromMilliseconds(10000), TimeSpan.FromMilliseconds(200))
+                              select win.Count();
+            var query2 = countStream.ToPointEventStream();
+            app.DisplayPointResults(query2);
         }
 
         static IQStreamable<newSensorReading> GetNewSensorStream(this Application app)

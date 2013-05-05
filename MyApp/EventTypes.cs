@@ -29,6 +29,8 @@ namespace MyApp
 
             string[] allLines = File.ReadAllLines(filename);
 
+            int count = 0;
+
             foreach (var s in allLines)
             {
                 if (s.Equals(""))
@@ -39,10 +41,12 @@ namespace MyApp
 
                 //Console.WriteLine(s);
 
+                count++;
+
                 newSensorReading e = new newSensorReading();
 
-                e.StartTime = DateTime.Now.ToUniversalTime();
-                e.EndTime = DateTime.Now.AddTicks(1000).ToUniversalTime();
+                e.StartTime = DateTime.Now.AddMilliseconds(count*200).ToUniversalTime();
+                e.EndTime = e.StartTime;
                 e.input1 = Convert.ToDouble(data[0]);
                 e.input2 = Convert.ToDouble(data[1]);
                 e.input3 = Convert.ToDouble(data[2]);

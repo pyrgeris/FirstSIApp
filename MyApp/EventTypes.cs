@@ -35,11 +35,11 @@ namespace MyApp
             {
                 if (s.Equals(""))
                 {
-                    Console.WriteLine("Blank string man");
+                    Console.WriteLine("Blank string");
                 }
                 String[] data = s.Split(',');
 
-                //Console.WriteLine(s);
+                Console.WriteLine(data[0]);
 
                 count++;
 
@@ -47,10 +47,10 @@ namespace MyApp
 
                 e.StartTime = DateTime.Now.AddMilliseconds(count*200).ToUniversalTime();
                 e.EndTime = e.StartTime;
-                e.input1 = Convert.ToDouble(data[0]);
-                e.input2 = Convert.ToDouble(data[1]);
-                e.input3 = Convert.ToDouble(data[2]);
-                e.input4 = Convert.ToDouble(data[3]);
+                e.input1 = double.Parse(data[0], System.Globalization.CultureInfo.InvariantCulture);
+                e.input2 = double.Parse(data[1], System.Globalization.CultureInfo.InvariantCulture);
+                e.input3 = double.Parse(data[2], System.Globalization.CultureInfo.InvariantCulture); 
+                e.input4 = double.Parse(data[3], System.Globalization.CultureInfo.InvariantCulture);
 
                 events.Add(e);
             }

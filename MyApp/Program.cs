@@ -10,6 +10,7 @@ namespace MyApp
     using Microsoft.ComplexEventProcessing;
     using Microsoft.ComplexEventProcessing.Linq;
     using System.Collections.Generic;
+    using Microsoft.ComplexEventProcessing.Extensibility;
 
     static class MyApp
     {
@@ -19,8 +20,6 @@ namespace MyApp
         {
 
             var inputStream = GetNewSensorStream(app);
-
-
             var query1 = from e in inputStream
                          select e;
             app.DisplayIntervalResults(query1);
@@ -42,9 +41,24 @@ namespace MyApp
             app.DisplayPointResults(query2);
         }
 
+
+        [DisplayName("Correlation Factor")]
+        [Description("Report the count of input values being processed at some time over \n" +
+                     "a 10000 ms window, with the window moving in 200 ms hops. \n" +
+                     "Provide the counts as of the last reported result as of a point \n" +
+                     "in time, reflecting the input values processed over the last 10000 ms.\n")]
+        static void CorrelationFactor(Application app)
+        {
+            var inputStream = app.GetNewSensorStream();
+            var countStream = from win in inputStream.HoppingWindow(TimeSpan.FromMilliseconds(10000), TimeSpan.FromMilliseconds(200))
+                              select win.UserDefinedAggregate<newSensorReading, Correlation, double>(null);
+            var query3 = countStream.ToPointEventStream();
+            app.DisplayPointResults(query3);
+
+        }
+
         static IQStreamable<newSensorReading> GetNewSensorStream(this Application app)
         {
-
             //AdvanceTimeGenerationSettings atgs =  new AdvanceTimeGenerationSettings(1,-TimeSpan.FromMilliseconds(100));
             //AdvanceTimeSettings ats = new AdvanceTimeSettings(atgs,null,AdvanceTimePolicy.Drop);
             IEnumerable<newSensorReading> newsensorReadings = newSensorReading.getSensorReadings(newSensorReadingsFileName);
@@ -52,6 +66,52 @@ namespace MyApp
                         e => PointEvent.CreateInsert<newSensorReading>(e.StartTime, e),
                         AdvanceTimeSettings.IncreasingStartTime);
             return newsensorStream;
+        }
+
+        public class Correlation : CepAggregate<newSensorReading, double>
+        {
+            public override double GenerateOutput(IEnumerable<newSensorReading> newsensorStream)
+            {
+                List<double> items = new List<double>();
+                List<double> items2 = new List<double>();
+                foreach (var e in newsensorStream) { items.Add(e.input3); items2.Add(e.input2); }
+
+                double[] array1 = items.ToArray();
+                double[] array2 = items2.ToArray();
+
+                double[] array_xy = new double[array1.Length];
+                double[] array_xp2 = new double[array1.Length];
+                double[] array_yp2 = new double[array1.Length];
+                for (int i = 0; i < array1.Length; i++)
+                    array_xy[i] = array1[i] * array2[i];
+                for (int i = 0; i < array1.Length; i++)
+                    array_xp2[i] = Math.Pow(array1[i], 2.0);
+                for (int i = 0; i < array1.Length; i++)
+                    array_yp2[i] = Math.Pow(array2[i], 2.0);
+                double sum_x = 0;
+                double sum_y = 0;
+                foreach (double n in array1)
+                    sum_x += n;
+                foreach (double n in array2)
+                    sum_y += n;
+                double sum_xy = 0;
+                foreach (double n in array_xy)
+                    sum_xy += n;
+                double sum_xpow2 = 0;
+                foreach (double n in array_xp2)
+                    sum_xpow2 += n;
+                double sum_ypow2 = 0;
+                foreach (double n in array_yp2)
+                    sum_ypow2 += n;
+                double Ex2 = Math.Pow(sum_x, 2.00);
+                double Ey2 = Math.Pow(sum_y, 2.00);
+
+                double Correl = (array1.Length * sum_xy - sum_x * sum_y) / Math.Sqrt((array1.Length * sum_xpow2 - Ex2) * (array1.Length * sum_ypow2 - Ey2));
+
+                return Correl;
+
+            }
+
         }
 
 

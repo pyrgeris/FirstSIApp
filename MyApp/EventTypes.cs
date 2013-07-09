@@ -39,18 +39,16 @@ namespace MyApp
                 }
                 String[] data = s.Split(',');
 
-                Console.WriteLine(data[0]);
-
-                count++;
-
                 newSensorReading e = new newSensorReading();
 
-                e.StartTime = DateTime.Now.AddMilliseconds(count*200).ToUniversalTime();
+                e.StartTime = DateTime.ParseExact("19891220 14:00:00", "yyyyMMdd HH:mm:ss", DateTimeFormatInfo.InvariantInfo).AddMilliseconds(200 * count).ToUniversalTime();
                 e.EndTime = e.StartTime;
                 e.input1 = double.Parse(data[0], System.Globalization.CultureInfo.InvariantCulture);
                 e.input2 = double.Parse(data[1], System.Globalization.CultureInfo.InvariantCulture);
-                e.input3 = double.Parse(data[2], System.Globalization.CultureInfo.InvariantCulture); 
+                e.input3 = double.Parse(data[2], System.Globalization.CultureInfo.InvariantCulture);
                 e.input4 = double.Parse(data[3], System.Globalization.CultureInfo.InvariantCulture);
+
+                count++;
 
                 events.Add(e);
             }

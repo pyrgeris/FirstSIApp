@@ -42,7 +42,7 @@ namespace MyApp
         }
 
 
-        [DisplayName("Correlation Factor")]
+        [DisplayName("Correlation Factor Hop Window")]
         [Description("Report the count of input values being processed at some time over \n" +
                      "a 10000 ms window, with the window moving in 200 ms hops. \n" +
                      "Provide the counts as of the last reported result as of a point \n" +
@@ -56,6 +56,20 @@ namespace MyApp
             app.DisplayPointResults(query3);
 
         }
+
+        [DisplayName("Correlation Factor Tumbling Window")]
+        [Description("Report the Correlation Factor of input1 and input2 being processed at some time over \n" +
+                     "a 10000 ms window. \n")]
+        static void CorrelationFactor3(Application app)
+        {
+            var inputStream = app.GetNewSensorStream();
+            var countStream = from win in inputStream.TumblingWindow(TimeSpan.FromMilliseconds(10000))
+                              select win.UserDefinedAggregate<newSensorReading, Correlation, double>(null);
+            var query4 = countStream.ToPointEventStream();
+            app.DisplayPointResults(query4);
+
+        }
+
 
         static IQStreamable<newSensorReading> GetNewSensorStream(this Application app)
         {

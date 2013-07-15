@@ -5,19 +5,19 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{29BCF268-1E69-476F-8ACE-7597EF1B78BA}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{D4473047-B7D8-4134-BFAC-36F0FE8AF97B}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>StreamInsight.Samples.HelloToll</RootNamespace>
-    <AssemblyName>StreamInsight.Samples.HelloToll</AssemblyName>
+    <RootNamespace>StreamInsight.Samples.Adapters.AsyncCsv</RootNamespace>
+    <AssemblyName>StreamInsight.Samples.Adapters.AsyncCsv</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <StartupObject>
+    </StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -30,8 +30,10 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,22 +54,41 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
   <ItemGroup>
-    <Reference Include="Microsoft.ComplexEventProcessing, Version=21.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.ComplexEventProcessing.Adapters, Version=21.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Program Files\Microsoft StreamInsight 2.1\Bin\Microsoft.ComplexEventProcessing.Adapters.dll</HintPath>
-    </Reference>
-    <Reference Include="StreamInsight.Samples.Adapters.AsyncCsv">
-      <HintPath>Adapters\AsyncCsv\bin\Debug\StreamInsight.Samples.Adapters.AsyncCsv.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Reactive, Version=1.0.10621.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="System.Reactive.Providers, Version=1.0.10621.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Compile Include="CsvInputAdapter.cs" />
+    <Compile Include="CsvCommon.cs" />
+    <Compile Include="CsvOutputEdge.cs" />
+    <Compile Include="CsvInputConfig.cs" />
+    <Compile Include="CsvInputFactory.cs" />
+    <Compile Include="CsvInputState.cs" />
+    <Compile Include="CsvInputInterval.cs" />
+    <Compile Include="CsvOutputInterval.cs" />
+    <Compile Include="CsvOutputAdapter.cs" />
+    <Compile Include="CsvOutputConfig.cs" />
+    <Compile Include="CsvOutputFactory.cs" />
+    <Compile Include="CsvInputPoint.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="CsvOutputPoint.cs" />
+    <Compile Include="IInputAdapter.cs" />
+    <Compile Include="IOutputAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventTypes.cs" />
-    <Compile Include="Program.cs" />
+    <Reference Include="Microsoft.ComplexEventProcessing" />
+    <Reference Include="Microsoft.ComplexEventProcessing.Adapters" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="_README.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -86,15 +107,4 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Input Data\input.csv" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

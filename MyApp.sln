@@ -2,6 +2,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyApp", "MyApp\MyApp.csproj", "{29BCF268-1E69-476F-8ACE-7597EF1B78BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncCsvAdapter", "MyApp\Adapters\AsyncCsv\AsyncCsvAdapter.csproj", "{D4473047-B7D8-4134-BFAC-36F0FE8AF97B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,6 +14,10 @@ Global
 		{29BCF268-1E69-476F-8ACE-7597EF1B78BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29BCF268-1E69-476F-8ACE-7597EF1B78BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29BCF268-1E69-476F-8ACE-7597EF1B78BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4473047-B7D8-4134-BFAC-36F0FE8AF97B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4473047-B7D8-4134-BFAC-36F0FE8AF97B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4473047-B7D8-4134-BFAC-36F0FE8AF97B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4473047-B7D8-4134-BFAC-36F0FE8AF97B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -24,5 +24,10 @@ namespace MyApp
         public double Count { get; set; }
     }
 
+    public class Correlations
+    {
+        public string Correlation { get; set; }
+    }
+
 
 }

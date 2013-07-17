@@ -18,13 +18,16 @@ namespace MyApp
     public class MyApp
     {
 
+        //Print Available Queries Menu to User
+
         private static int AskUserWhichQuery()
         {
             Console.WriteLine();
             Console.WriteLine("Pick a query:");
             Console.WriteLine("0. Pass-through");
             Console.WriteLine("1. Hop-Count");
-            Console.WriteLine("2. Exit");
+            Console.WriteLine("2. Correlation Tumbling Window");
+            Console.WriteLine("3. Exit");
 
             string queryNumStr = Console.ReadLine();
             int queryNum;
@@ -35,11 +38,13 @@ namespace MyApp
             }
             catch (FormatException)
             {
-                queryNum = 2;
+                queryNum = 3;
             }
 
             return queryNum;
         }
+
+        //Queries
 
         static void PassThrough()
         {
@@ -47,7 +52,7 @@ namespace MyApp
             // Define input stream object, mapped to stream names
             // Instantiate an adapter from the input factory class
             var queryStream = from e in inputStream select e;
-            BindAndRunQuery(
+            BindandQuery.BindAndRunQuery(
                 "PassThrough",
                 queryStream,
                 EventShape.Interval,
@@ -65,7 +70,7 @@ namespace MyApp
                                             TimeSpan.FromMilliseconds(10 * 200),    // Hop Size
                                             HoppingWindowOutputPolicy.ClipToWindowEnd)
                               select new HopCount { Count = w.Count() };
-            BindAndRunQuery(
+            BindandQuery.BindAndRunQuery(
                 "HopCount",
                 queryStream,
                 EventShape.Interval,
@@ -74,72 +79,24 @@ namespace MyApp
 
         }
 
-
-        private static void BindAndRunQuery<TPayload>(string queryName, CepStream<TPayload> queryStream, EventShape outputEventShape, List<string> inputFields, List<string> outputFields)
+        static void Correlation_Tumbling_Window()
         {
-            var inputConfig = new CsvInputConfig
-            {
-                InputFileName = @"..\MyApp\Input Data\input.csv",
-                Delimiter = new char[] { ',' },
-                BufferSize = 4096,
-                CtiFrequency = 1,
-                CultureName = "en-US",
-                Fields = inputFields,
-                NonPayloadFieldCount = 0,
-                StartTimePos = 1,
-                EndTimePos = 6
-            };
+            var inputStream = CepStream<MyReading>.Create("MyStream");
+            // Define input stream object, mapped to stream names
+            // Instantiate an adapter from the input factory class
+            var countStream = from win in inputStream.TumblingWindow(TimeSpan.FromMilliseconds(20000), HoppingWindowOutputPolicy.ClipToWindowEnd)
+                              select new Correlations { Correlation = win.UserDefinedAggregate<MyReading, CorrelationUDO, string>(null) };              
 
-            // The adapter recognizes empty filename as a write to console.
-            var outputConfig = new CsvOutputConfig
-            {
-                OutputFileName = @"..\MyApp\Output Data\output.txt",
-                Delimiter = new string[] { "\t" },
-                CultureName = "en-US",
-                Fields = outputFields
-            };
+            BindandQuery.BindAndRunQuery(
+                "Correlation Tumbling Window",
+                countStream,
+                EventShape.Point,
+                new List<string>() { "input1", "input2", "input3", "input4", "input5" },
+                new List<string>() { "Correlation" } );
 
-            // Note - Please change the instance name to the one you have chosen during installation
-            using (var server = Server.Create("Instance1"))
-            {
-                Application application = server.CreateApplication("MyApp");
-
-                // set up input and output adapters
-                InputAdapter inputAdapter = application.CreateInputAdapter<CsvInputFactory>("input", "Csv Input Source");
-                OutputAdapter outputAdapter = application.CreateOutputAdapter<CsvOutputFactory>("output", "Csv Output");
-
-                // set up the query template
-                QueryTemplate queryTemplate = application.CreateQueryTemplate("QueryTemplate", string.Empty, queryStream);
-
-                // set up advance time settings to enqueue CTIs
-                var advanceTimeGenerationSettings = new AdvanceTimeGenerationSettings(inputConfig.CtiFrequency, TimeSpan.FromMilliseconds(200), true);
-                var advanceTimeSettings = new AdvanceTimeSettings(advanceTimeGenerationSettings, null, AdvanceTimePolicy.Adjust);
-
-                // Bind query template to input and output streams
-                QueryBinder queryBinder = new QueryBinder(queryTemplate);
-                queryBinder.BindProducer<MyReading>("MyStream", inputAdapter, inputConfig, EventShape.Point, advanceTimeSettings);
-                queryBinder.AddConsumer("outputStream", outputAdapter, outputConfig, outputEventShape, StreamEventOrder.FullyOrdered);
-
-                // Create a runnable query by binding the query template to the input stream of interval events,
-                // and to an output stream of fully ordered point events (through an output adapter instantiated
-                // from the output factory class)
-                Query query = application.CreateQuery(queryName, "Query", queryBinder);
-
-                RunQuery(query);
-            }
         }
 
-        private static void RunQuery(Query query)
-        {
-            query.Start();
-
-            Console.WriteLine("***Hit Return to exit after viewing query output***");
-            Console.WriteLine();
-            Console.ReadLine();
-
-            query.Stop();
-        }
-
+        //Trivial Main
 
         internal static void Main()
         {
@@ -154,6 +111,9 @@ namespace MyApp
                         break;
                     case 1:
                         HopCount();
+                        break;
+                    case 2:
+                        Correlation_Tumbling_Window();
                         break;
                     case 12:
                         return;
